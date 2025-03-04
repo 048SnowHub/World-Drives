@@ -5,44 +5,58 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
 
-// Criar uma estrada simples
-const roadGeometry = new THREE.BoxGeometry(10, 0.1, 2);
-const roadMaterial = new THREE.MeshBasicMaterial({ color: 0x4db6ac });
-const road = new THREE.Mesh(roadGeometry, roadMaterial);
-road.position.y = -0.05; // Posicionar a estrada ligeiramente abaixo do centro
-scene.add(road);
+// Criar o chão
+const groundGeometry = new THREE.PlaneGeometry(1000, 1000);
+const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22, side: THREE.DoubleSide });
+const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+ground.rotation.x = -Math.PI / 2; // Rotacionar para ficar plano
+scene.add(ground);
 
-// Criar um jogador (cubo)
-const playerGeometry = new THREE.BoxGeometry(0.5, 1, 0.5);
-const playerMaterial = new THREE.MeshBasicMaterial({ color: 0x2196F3 });
-const player = new THREE.Mesh(playerGeometry, playerMaterial);
-scene.add(player);
+// Criar o céu
+const skyGeometry = new THREE.SphereGeometry(1000, 32, 32);
+const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87CEEB, side: THREE.BackSide });
+const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+scene.add(sky);
+
+// Criar o carro (um cubo simples para representar o carro)
+const carGeometry = new THREE.BoxGeometry(1, 0.5, 0.5);
+const carMaterial = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+const car = new THREE.Mesh(carGeometry, carMaterial);
+car.position.y = 0.25; // Levantar o carro um pouco acima do chão
+scene.add(car);
 
 // Definir a posição da câmera
-camera.position.z = 5;
+camera.position.set(0, 2, 5);
+camera.lookAt(car.position);
+
+// Variáveis de movimento
+let speed = 0.1;
 
 // Loop de animação
 function animate() {
     requestAnimationFrame(animate);
+    
+    // Mover o carro para frente
+    car.position.z -= speed;
+
+    // Repetir o chão para criar um efeito de infinito
+    if (car.position.z < -50) {
+        car.position.z = 0;
+    }
+
     renderer.render(scene, camera);
 }
 animate();
 
-// Manipular entrada do teclado para movimento do jogador
+// Manipular entrada do teclado para movimento do carro
 document.addEventListener('keydown', (event) => {
-    const speed = 0.1;
+    const turnSpeed = 0.05;
     switch (event.key) {
-        case 'ArrowUp':
-            player.position.z -= speed;
-            break;
-        case 'ArrowDown':
-            player.position.z += speed;
-            break;
         case 'ArrowLeft':
-            player.position.x -= speed;
+            car.rotation.y += turnSpeed; // Virar para a esquerda
             break;
         case 'ArrowRight':
-            player.position.x += speed;
+            car.rotation.y -= turnSpeed; // Virar para a direita
             break;
     }
 });
