@@ -30,13 +30,13 @@ camera.position.set(0, 2, 5);
 camera.lookAt(car.position);
 
 // Variáveis de movimento
-let speed = 0.1;
+let speed = 0; // Inicialmente, a velocidade é 0
 
 // Loop de animação
 function animate() {
     requestAnimationFrame(animate);
     
-    // Mover o carro para frente
+    // Mover o carro para frente ou para trás com base na velocidade
     car.position.z -= speed;
 
     // Repetir o chão para criar um efeito de infinito
@@ -52,11 +52,24 @@ animate();
 document.addEventListener('keydown', (event) => {
     const turnSpeed = 0.05;
     switch (event.key) {
+        case 'ArrowUp':
+            speed = 0.1; // Aumentar a velocidade ao pressionar a seta para cima
+            break;
+        case 'ArrowDown':
+            speed = -0.1; // Diminuir a velocidade ao pressionar a seta para baixo
+            break;
         case 'ArrowLeft':
             car.rotation.y += turnSpeed; // Virar para a esquerda
             break;
         case 'ArrowRight':
             car.rotation.y -= turnSpeed; // Virar para a direita
             break;
+    }
+});
+
+// Parar o carro quando a tecla for solta
+document.addEventListener('keyup', (event) => {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        speed = 0; // Parar o carro ao soltar a tecla
     }
 });
